@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { formatLocalDate, magnitudeBucket } from '../utils/usgs';
+import { formatLocalDate, magnitudeBucket, relativeTime } from '../utils/usgs';
 
 function SismoCard({ sismo }) {
   const { mag, place, time, depth, url } = sismo;
@@ -7,16 +7,18 @@ function SismoCard({ sismo }) {
 
   return (
     <article className={`sismo-card nivel-${nivel}`}>
-      <div className="mag" aria-label={`Magnitud ${mag.toFixed(1)}`}>
-        {mag.toFixed(1)}
+      <div className="sismo-card-top">
+        <div className="mag" aria-label={`Magnitud ${mag.toFixed(1)}`}>
+          {mag.toFixed(1)}
+        </div>
+        <span className={`badge ${nivel}`}>{nivel}</span>
       </div>
       <div className="detalle">
         <h3>{place ?? 'Ubicación desconocida'}</h3>
-        <dl>
-          <div><dt>Fecha</dt><dd>{formatLocalDate(time)}</dd></div>
-          <div><dt>Profundidad</dt><dd>{depth.toFixed(0)} km</dd></div>
-          <div><dt>Categoría</dt><dd className={`badge ${nivel}`}>{nivel}</dd></div>
-        </dl>
+        <div className="meta">
+          <span title={formatLocalDate(time)}>🕒 {relativeTime(time)}</span>
+          <span>📍 {depth.toFixed(0)} km</span>
+        </div>
         <a href={url} target="_blank" rel="noreferrer">Detalle USGS ↗</a>
       </div>
     </article>

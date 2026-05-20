@@ -41,3 +41,22 @@ export function formatLocalDate(ms) {
     timeZone: 'America/Lima',
   });
 }
+
+const RTF = new Intl.RelativeTimeFormat('es-PE', { numeric: 'auto' });
+
+export function relativeTime(ms, now = Date.now()) {
+  const diffSec = Math.round((ms - now) / 1000);
+  const abs = Math.abs(diffSec);
+  if (abs < 60) return RTF.format(diffSec, 'second');
+  if (abs < 3600) return RTF.format(Math.round(diffSec / 60), 'minute');
+  if (abs < 86400) return RTF.format(Math.round(diffSec / 3600), 'hour');
+  if (abs < 2592000) return RTF.format(Math.round(diffSec / 86400), 'day');
+  return RTF.format(Math.round(diffSec / 2592000), 'month');
+}
+
+export const MAG_BUCKETS = [
+  { id: 'leve', label: 'Leve', min: 0, color: '#5eead4' },
+  { id: 'moderado', label: 'Moderado', min: 5, color: '#f59e0b' },
+  { id: 'fuerte', label: 'Fuerte', min: 6, color: '#ef4444' },
+  { id: 'severo', label: 'Severo', min: 7, color: '#dc2626' },
+];

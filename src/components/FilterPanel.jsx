@@ -26,6 +26,18 @@ function FilterPanel({ filters, dispatch, onReset, total, filtrados }) {
 
       <label className="field">
         <span>Ventana de días: <b>{filters.days}</b></span>
+        <div className="presets">
+          {[1, 7, 30, 90].map((d) => (
+            <button
+              key={d}
+              type="button"
+              className={`chip ${filters.days === d ? 'active' : ''}`}
+              onClick={() => dispatch({ type: 'setDays', payload: d })}
+            >
+              {d === 1 ? '24h' : `${d}d`}
+            </button>
+          ))}
+        </div>
         <input
           type="range"
           min="1"

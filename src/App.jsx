@@ -3,6 +3,8 @@ import Header from './components/Header';
 import FilterPanel from './components/FilterPanel';
 import SismoList from './components/SismoList';
 import Stats from './components/Stats';
+import FeaturedSismo from './components/FeaturedSismo';
+import MagnitudeBar from './components/MagnitudeBar';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { useFetch } from './hooks/useFetch';
@@ -87,9 +89,15 @@ function Dashboard() {
         <div className="content">
           <div className="toolbar">
             <h2>Eventos recientes</h2>
-            <button onClick={handleRefresh} className="ghost">↻ Refrescar</button>
+            <button onClick={handleRefresh} className="ghost" disabled={loading}>
+              ↻ Refrescar
+            </button>
           </div>
+          {!loading && !error && <FeaturedSismo sismos={sismosFiltrados} />}
           <Stats sismos={sismosFiltrados} />
+          {!loading && !error && sismosFiltrados.length > 0 && (
+            <MagnitudeBar sismos={sismosFiltrados} />
+          )}
           <SismoList sismos={sismosFiltrados} loading={loading} error={error} />
         </div>
       </main>

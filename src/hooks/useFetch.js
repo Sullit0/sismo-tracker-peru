@@ -1,8 +1,18 @@
 import { useEffect, useReducer } from 'react';
 
-// Hook personalizado (Paso 5).
-// Encapsula: estado de carga, error, datos, AbortController para limpiar.
-// Reglas de Hooks: este hook solo invoca useEffect/useReducer al nivel superior.
+// =============================================================================
+// PASO 5 — Hook Personalizado: useFetch
+// =============================================================================
+// Encapsula la lógica de carga HTTP en un hook reutilizable. Estado expuesto:
+// { data, error, loading }. Maneja:
+//   • useReducer interno para no acumular múltiples useState descoordinados.
+//   • AbortController para cancelar la request si el componente se desmonta o
+//     si las dependencias cambian (cubre el PASO 2 del laboratorio).
+//   • Compatible con React.StrictMode (PASO 1): el doble-invoke en dev se
+//     absorbe descartando AbortError.
+// Reglas de Hooks: useFetch llama useEffect/useReducer SOLO al nivel superior,
+// nunca dentro de loops, condiciones ni funciones anidadas.
+// =============================================================================
 
 const initial = { data: null, error: null, loading: true };
 
@@ -22,6 +32,15 @@ function fetchReducer(state, action) {
 export function useFetch(url, { transform, refreshKey = 0 } = {}) {
   const [state, dispatch] = useReducer(fetchReducer, initial);
 
+  // ---------------------------------------------------------------------------
+  // PASO 2 — useEffect con async/await + AbortController
+  // ---------------------------------------------------------------------------
+  // El efecto refetchea cuando cambia la URL, la función transform o un
+  // refreshKey externo. El cleanup aborta la request en vuelo: indispensable
+  // porque en StrictMode el efecto se ejecuta 2× en dev (NO es "una sola vez"
+  // aunque las deps no cambien) y porque evita memory leaks si el componente
+  // se desmonta antes de que la respuesta llegue.
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (!url) return;
     const controller = new AbortController();
@@ -44,10 +63,6 @@ export function useFetch(url, { transform, refreshKey = 0 } = {}) {
     })();
 
     return () => controller.abort();
-    // IA: useEffect con [url] disparaba 2x en StrictMode → Solución manual:
-    // usamos AbortController para cancelar la primera request, la segunda
-    // resuelve y actualiza el estado sin race condition. refreshKey permite
-    // forzar un refetch aunque la URL no cambie.
   }, [url, transform, refreshKey]);
 
   return state;

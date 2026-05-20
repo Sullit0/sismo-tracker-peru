@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ThemeContext } from './theme-context';
 
-// Paso 3: ThemeProvider aislado del AuthProvider (un contexto por dominio).
+// =============================================================================
+// PASO 3 — useContext por dominio (parte 1/2: ThemeContext)
+// =============================================================================
+// ThemeProvider aislado del AuthProvider para evitar "contextos gigantes" que
+// fuerzan re-renders innecesarios. Un Provider por dominio:
+//   • ThemeContext → preferencia visual (tema oscuro/claro).
+//   • AuthContext  → estado de sesión del observador (AuthContext.jsx).
+// La constante del contexto vive en theme-context.js para no romper React
+// Fast Refresh (un archivo .jsx solo exporta componentes).
+// =============================================================================
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const stored = localStorage.getItem('sismo:theme');

@@ -28,6 +28,17 @@ function transformUsgs(json) {
 }
 
 function Dashboard() {
+  // ===========================================================================
+  // PASO 4 — useMemo / useCallback / useRef / useReducer
+  // ===========================================================================
+  // En este componente conviven los 4 hooks de optimización:
+  //   • useReducer (abajo) → consolida la state-machine de filtros.
+  //   • useMemo → URL del USGS, lista filtrada/ordenada, agregados de Stats.
+  //   • useCallback → handleReset y handleRefresh con referencia estable
+  //     para que <FilterPanel memo> y <button> no re-rendeen sin motivo.
+  //   • useRef → en Header.jsx (input de login) y FilterPanel.jsx (auto-focus
+  //     del buscador).
+  // ===========================================================================
   const [filters, dispatch] = useReducer(filtersReducer, initialFilters);
   const [lastRefresh, setLastRefresh] = useState(() => Date.now());
 

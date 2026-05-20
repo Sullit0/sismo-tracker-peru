@@ -30,19 +30,20 @@ function Dashboard() {
   const [lastRefresh, setLastRefresh] = useState(() => Date.now());
 
   // useMemo: la URL solo cambia cuando varían los parámetros del servidor
-  // (días / magnitud mínima) o el lastRefresh. Con esto evitamos que cada
-  // tecla en "Buscar lugar" dispare un nuevo fetch — esa búsqueda se hace
-  // sobre el cliente. lastRefresh entra como nonce (cache-buster real)
-  // para que también sea una dependencia legítima del memo.
+  // (días / magnitud mínima). Con esto evitamos que cada tecla en "Buscar
+  // lugar" dispare un nuevo fetch — esa búsqueda se hace sobre el cliente.
   const url = useMemo(
-    () => buildUsgsUrl({ days: filters.days, minMag: filters.minMag, nonce: lastRefresh }),
-    [filters.days, filters.minMag, lastRefresh]
+    () => buildUsgsUrl({ days: filters.days, minMag: filters.minMag }),
+    [filters.days, filters.minMag]
   );
   // IA sugirió incluir [filters] entero como dep → Solución manual:
   // pasamos solo los campos que afectan la URL del servidor. Esto evita
   // un loop de refetch cada vez que el usuario tipea en el buscador.
 
-  const { data: sismos, loading, error } = useFetch(url, { transform: transformUsgs });
+  const { data: sismos, loading, error } = useFetch(url, {
+    transform: transformUsgs,
+    refreshKey: lastRefresh, // permite forzar refetch sin cambiar la URL
+  });
 
   // Debounce del texto de búsqueda para no filtrar en cada keystroke.
   const queryDebounced = useDebounce(filters.query, 200);

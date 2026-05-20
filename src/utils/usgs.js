@@ -7,8 +7,10 @@ export const PERU_BBOX = {
   maxLng: -68.5,
 };
 
-export function buildUsgsUrl({ days = 30, minMag = 4.0, nonce = 0 } = {}) {
-  const endtime = new Date();
+export function buildUsgsUrl({ days = 30, minMag = 4.0 } = {}) {
+  // endtime ligeramente atrasado: USGS no acepta endtime en el futuro y la
+  // ventana de hoy puede estar aún siendo procesada.
+  const endtime = new Date(Date.now() - 60 * 60 * 1000);
   const starttime = new Date(endtime.getTime() - days * 24 * 60 * 60 * 1000);
   const params = new URLSearchParams({
     format: 'geojson',
@@ -22,9 +24,6 @@ export function buildUsgsUrl({ days = 30, minMag = 4.0, nonce = 0 } = {}) {
     orderby: 'time',
     limit: '500',
   });
-  // nonce: USGS ignora params desconocidos; lo usamos como cache-buster real
-  // para forzar el refresh sin tener que recordarlo en el dep array.
-  if (nonce) params.set('_', String(nonce));
   return `https://earthquake.usgs.gov/fdsnws/event/1/query?${params.toString()}`;
 }
 

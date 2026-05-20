@@ -19,7 +19,7 @@ function fetchReducer(state, action) {
   }
 }
 
-export function useFetch(url, { transform } = {}) {
+export function useFetch(url, { transform, refreshKey = 0 } = {}) {
   const [state, dispatch] = useReducer(fetchReducer, initial);
 
   useEffect(() => {
@@ -46,8 +46,9 @@ export function useFetch(url, { transform } = {}) {
     return () => controller.abort();
     // IA: useEffect con [url] disparaba 2x en StrictMode → Solución manual:
     // usamos AbortController para cancelar la primera request, la segunda
-    // resuelve y actualiza el estado sin race condition.
-  }, [url, transform]);
+    // resuelve y actualiza el estado sin race condition. refreshKey permite
+    // forzar un refetch aunque la URL no cambie.
+  }, [url, transform, refreshKey]);
 
   return state;
 }
